@@ -1,0 +1,197 @@
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYsUpQnWo8kqPoSK18VBKodMDr2cE5lAA&sensor=false"></script>
+
+<script>
+function initialize() {
+
+		  var  lat = <%= @lat %>;
+		  var  lng = <%= @lng %>;
+
+		  // if user has previously granted access to location, will make api request on page load. Otherwise shows default longitude and latitude (NYC in this case) and makes no api request
+		  if(<%= @has_session_location %>) {
+
+			  getLastFmData(lat,lng);
+
+		  } else {
+			  
+			  var  myLocation = new google.maps.LatLng(lat, lng);
+			  
+			  var mapOptions = {
+				center: new google.maps.LatLng(myLocation.lat(),myLocation.lng()),
+				zoom: 13,
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			  };
+		  
+			  var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
+		  
+			  var marker = new google.maps.Marker({
+				position: myLocation,
+				map: map,
+				title:"you are here",
+				icon: "/assets/tapman.png",
+				zIndex: 99
+			
+				});
+		  }
+}
+
+function getLastFmData(lat,lng) {
+
+		  // setting location and positioning map / marker based on passed on lat and lng
+		  var myLocation = new google.maps.LatLng(lat, lng);
+
+		  var mapOptions = {
+			center: new google.maps.LatLng(lat,lng),
+			zoom: 13,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		  };
+		  
+		  var map = new google.maps.Map(document.getElementById("map-canvas"),mapOptions);
+
+		  var marker = new google.maps.Marker({
+			position: myLocation,
+			map: map,
+			title:"you are here",
+			icon: "/assets/tapman.png",
+			zIndex: 99
+			
+			});
+
+		  // requesting nearby event data from last fm api
+		  $.get('http://ws.audioscrobbler.com/2.0/?method=geo.getevents&long='+lng+'&lat='+lat+'&api_key=027a3f56d29b8a14d7e2270344daf740&format=json&raw=true&distance=10&limit=25', function(data) {
+
+				  // Display multiple markers on a map
+				  var infoWindow = new google.maps.InfoWindow(), marker, i;
+				  var infoWindowContent = [];
+
+				  // loop through each event to put marker on map
+				  for (i = 0; i < data.event.length; i++) {
+
+				  	var last_fm_obj = data.event[i];
+		 			var geo_lat = last_fm_obj.venue.location['geo:point']['geo:lat'];
+					var geo_long = last_fm_obj.venue.location['geo:point']['geo:long'];
+					var headliner = last_fm_obj.artists.headliner;
+
+				      	var marker = new google.maps.Marker({
+						position: new google.maps.LatLng(geo_lat, geo_long),
+						map: map,
+						animation: google.maps.Animation.DROP,
+						title: headliner,
+						zIndex: i + 1,
+						icon: '/assets/map_symbol.png'
+						});
+
+					//set infoWindowContent for i
+					var eventDate = new Date(last_fm_obj.startDate);
+					infoWindowContent[i] = ['<div class="info_content">' + '<h4 style="margin-bottom:5px;">' + last_fm_obj.title + '</h4><h5 style="margin-bottom:10px;">' + eventDate.getMonth() + '/' + eventDate.getDay() + '/' + eventDate.getFullYear() +'</h5></div><h6 style="margin-bottom:5px;">Most Popular Albums</h6>'];
+
+					//passing in current headliner and iterator to get popular albums for each and append them to pop-up window html
+					getTopAlbums(i,headliner);
+
+
+function getTopAlbums(iterator,headliner) {
+	
+		// headliner's top albums api request
+		$.get('http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=' + headliner + '&api_key=027a3f56d29b8a14d7e2270344daf740&format=json&raw=true&limit=3', function(albumData) {
+
+			var headlinerAlbums = [];
+
+			// Save top albums for headliner to array
+
+			if(albumData.album && albumData.album.length > 0) {
+
+				for (i = 0; i < albumData.album.length; i++) {
+					headlinerAlbums[i] = albumData.album[i].name;
+					}
+			}
+
+			// Append top albums to infoWindowContent
+			infoWindowContent[iterator][0] += '<ul>';
+			if(headlinerAlbums && headlinerAlbums.length > 0) {
+				for (x = 0; x < headlinerAlbums.length; x++) {
+					infoWindowContent[iterator][0] += '<li>' + headlinerAlbums[x] + '</li>';
+				}
+
+			} else {
+
+				infoWindowContent[iterator][0] += '<li>Album Information Not Available</li>';
+			}
+
+
+			infoWindowContent[iterator][0] += '</ul>';
+
+
+
+		}); // end headliner top albums api request
+} // end getTopAlbums function
+
+
+
+	// Allow each marker to have an info window    
+	google.maps.event.addListener(marker, 'click', (function(marker, i) {
+	return function() {
+		console.log(infoWindowContent[i][0]);
+		infoWindow.setContent(infoWindowContent[i][0]);
+		infoWindow.open(map, marker);
+		}
+	})(marker, i));
+	
+			} // end data.event loop
+		}); // end geo.event last fm api request
+} // end function getLastFmData
+
+
+// on DOM load
+$(function() {
+		$.ajaxSetup({
+			headers: {'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')}
+			});
+
+		initialize();
+		$('#get_location_button').click(function(){
+			$('#loading').show();
+			console.log('working');
+			if (navigator.geolocation) {
+				navigator.geolocation.getCurrentPosition(setPosition);
+			} else {
+        			x.innerHTML = "Geolocation is not supported by this browser.";
+			}
+
+			function setPosition(position) {
+				var current_position_lat = position.coords.latitude;
+				var current_position_lng = position.coords.longitude;
+				getLastFmData(current_position_lat,current_position_lng);
+				var current_position_array = [current_position_lat, current_position_lng];
+				$.post('welcome/update_user_session_location', { current_position_array: current_position_array });
+				$('#loading').hide();
+				
+				}
+			
+			});
+
+		});
+  </script>
+
+  <style>
+#map-canvas {width:50%; min-width:300px;margin:0px auto;height:300px;}
+#loading {display:none;width:100%;background:rgba(12, 12, 12, 0.2);height:100%;position:fixed;top:0;}
+#loading img {display:inline-block;width:20px; margin:100px auto;position:fixed;left:50%;}
+#get_location_button {position:relative;top:100px;}
+.container {width:900px;}
+  </style>
+
+  <%= session[:current_position_array] %>
+  <%= link_to('Use Current Location', '#', id: 'get_location_button', class: 'btn')%>
+
+  <div class="container">
+	  
+	  <div id="map-container">
+		  <div id="map-canvas"></div>
+	  </div>
+
+	  <div id="loading"><%= image_tag 'ajax-loader.gif'%></div>
+
+  </div> <!-- container -->
+
+ 
+  <%= session[:current_position_array] %>
+
