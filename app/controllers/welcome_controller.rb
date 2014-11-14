@@ -4,6 +4,7 @@ class WelcomeController < ApplicationController
 	@lng = -74.0059
 	@has_session_location = false
 
+
 	
 	if session[:current_position_array] && ! session[:current_position_array].empty?
 
@@ -21,5 +22,11 @@ class WelcomeController < ApplicationController
 		session[:current_position_array] = params[:current_position_array]
 	end
   end
+
+  def delete_user_session_location
+	  session[:current_position_array] = []
+	  redirect_to root_path
+  end
+
 
 end

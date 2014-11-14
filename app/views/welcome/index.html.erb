@@ -1,12 +1,14 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYsUpQnWo8kqPoSK18VBKodMDr2cE5lAA&sensor=false"></script>
 
 <script>
+
+// initialize function called on DOM load. If user has previously set location, will ping Google maps with that location, make API request to lastfm for upcoming events close to location and populate map with markers using getLastFmData function. Otherwise will set map to default long and lat set in welcome#index controller and wait for user to click to request that app uses current location
+
 function initialize() {
 
 		  var  lat = <%= @lat %>;
 		  var  lng = <%= @lng %>;
 
-		  // if user has previously granted access to location, will make api request on page load. Otherwise shows default longitude and latitude (NYC in this case) and makes no api request
 		  if(<%= @has_session_location %>) {
 
 			  getLastFmData(lat,lng);
@@ -36,8 +38,17 @@ function initialize() {
 
 function getLastFmData(lat,lng) {
 
-		  // setting location and positioning map / marker based on passed on lat and lng
 		  var myLocation = new google.maps.LatLng(lat, lng);
+
+		  // grabbing current address and updating current city html
+		  geocoder = new google.maps.Geocoder();
+			  geocoder.geocode({'latLng': myLocation}, function(results, status) {
+					  if (status == google.maps.GeocoderStatus.OK) {
+					  	var city_result = results[0].formatted_address;
+					  	$("#city_result").html("Current Location: " + city_result);
+					  } 
+			  });
+
 
 		  var mapOptions = {
 			center: new google.maps.LatLng(lat,lng),
@@ -82,20 +93,17 @@ function getLastFmData(lat,lng) {
 
 					//set infoWindowContent for i
 					var eventDate = new Date(last_fm_obj.startDate);
-					infoWindowContent[i] = ['<div class="info_content">' + '<h4 style="margin-bottom:5px;">' + last_fm_obj.title + '</h4><h5 style="margin-bottom:10px;">' + eventDate.getMonth() + '/' + eventDate.getDay() + '/' + eventDate.getFullYear() +'</h5></div><h6 style="margin-bottom:5px;">Most Popular Albums</h6>'];
+					infoWindowContent[i] = ['<div class="info_content">' + '<h1>' + last_fm_obj.title + '</h1><h2>' + eventDate.getMonth() + '/' + eventDate.getDay() + '/' + eventDate.getFullYear() +'</h2><h3>Most Popular Albums</h3></div>'];
 
-					//passing in current headliner and iterator to get popular albums for each and append them to pop-up window html
 					getTopAlbums(i,headliner);
 
-
+						
+// request top albums for headliner passed in as parameter from lastFM api and appends resulting data to infoWindowContent
 function getTopAlbums(iterator,headliner) {
 	
-		// headliner's top albums api request
 		$.get('http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=' + headliner + '&api_key=027a3f56d29b8a14d7e2270344daf740&format=json&raw=true&limit=3', function(albumData) {
 
 			var headlinerAlbums = [];
-
-			// Save top albums for headliner to array
 
 			if(albumData.album && albumData.album.length > 0) {
 
@@ -104,7 +112,7 @@ function getTopAlbums(iterator,headliner) {
 					}
 			}
 
-			// Append top albums to infoWindowContent
+			// Append to infoWindowContent
 			infoWindowContent[iterator][0] += '<ul>';
 			if(headlinerAlbums && headlinerAlbums.length > 0) {
 				for (x = 0; x < headlinerAlbums.length; x++) {
@@ -121,12 +129,11 @@ function getTopAlbums(iterator,headliner) {
 
 
 
-		}); // end headliner top albums api request
-} // end getTopAlbums function
+		});
+} // end getTopAlbums
 
 
-
-	// Allow each marker to have an info window    
+	// Add click event handler for each marker    
 	google.maps.event.addListener(marker, 'click', (function(marker, i) {
 	return function() {
 		console.log(infoWindowContent[i][0]);
@@ -147,9 +154,12 @@ $(function() {
 			});
 
 		initialize();
+
+		// add click event to run getLastFmData if user requests to use current location
 		$('#get_location_button').click(function(){
-			$('#loading').show();
-			console.log('working');
+			$('.loading').show();
+			$('.instructions').hide();
+			$('#get_location_button').hide();
 			if (navigator.geolocation) {
 				navigator.geolocation.getCurrentPosition(setPosition);
 			} else {
@@ -161,37 +171,51 @@ $(function() {
 				var current_position_lng = position.coords.longitude;
 				getLastFmData(current_position_lat,current_position_lng);
 				var current_position_array = [current_position_lat, current_position_lng];
+
+				// add session location in welcome#update_user_session_location
 				$.post('welcome/update_user_session_location', { current_position_array: current_position_array });
-				$('#loading').hide();
+				$('.loading').hide();
 				
 				}
+
+			$('#delete_location_button').show();
+
 			
 			});
 
 		});
   </script>
 
-  <style>
-#map-canvas {width:50%; min-width:300px;margin:0px auto;height:300px;}
-#loading {display:none;width:100%;background:rgba(12, 12, 12, 0.2);height:100%;position:fixed;top:0;}
-#loading img {display:inline-block;width:20px; margin:100px auto;position:fixed;left:50%;}
-#get_location_button {position:relative;top:100px;}
-.container {width:900px;}
-  </style>
+  
+  <div id="container">
 
-  <%= session[:current_position_array] %>
-  <%= link_to('Use Current Location', '#', id: 'get_location_button', class: 'btn')%>
+	  <h3 id="city_result">Default City: New York, NY</h3>
 
-  <div class="container">
-	  
+	  <% if ! @has_session_location %>
+		  <p class="instructions">Click below to set your current location and see upcoming music events around you!</p>
+	  <% end %>
+
+	  <div class="center-span3">
+		  <% if ! @has_session_location %>
+			  <%= link_to('Use Current Location', '#', id: 'get_location_button', class: 'button')%>
+			  <%= link_to('Delete Current Location', delete_user_session_location_path, method: :post, id: 'delete_location_button', class: 'button')%>
+
+		  <% else %>
+
+			  <%= link_to('Delete Current Location', delete_user_session_location_path, method: :post, id: 'delete_location_button', class: 'button', style: 'display: block;')%>
+
+		  <% end %>
+
+	  </div> <!-- center-span3 -->
+
 	  <div id="map-container">
 		  <div id="map-canvas"></div>
-	  </div>
-
-	  <div id="loading"><%= image_tag 'ajax-loader.gif'%></div>
+	  </div> <!-- map-container -->
 
   </div> <!-- container -->
 
- 
-  <%= session[:current_position_array] %>
+  <!-- modal for ajax requests -->
+  <div class="loading"><%= image_tag 'ajax-loader.gif'%></div>
 
+
+ 

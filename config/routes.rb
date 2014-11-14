@@ -7,6 +7,8 @@ TaprootApplication::Application.routes.draw do
    root 'welcome#index'
    
    post '/welcome/update_user_session_location', to: 'welcome#update_user_session_location'
+   post '/welcome/delete_user_session_location', to: 'welcome#delete_user_session_location'
+   get '/welcome/delete_user_session_location', to: 'welcome#delete_user_session_location', as:'delete_user_session_location'
    
 
   # Example of regular route:
