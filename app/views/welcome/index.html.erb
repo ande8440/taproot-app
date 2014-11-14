@@ -68,7 +68,7 @@ function getLastFmData(lat,lng) {
 			});
 
 		  // requesting nearby event data from last fm api
-		  $.get('http://ws.audioscrobbler.com/2.0/?method=geo.getevents&long='+lng+'&lat='+lat+'&api_key=027a3f56d29b8a14d7e2270344daf740&format=json&raw=true&distance=10&limit=25', function(data) {
+		  $.get('https://ws.audioscrobbler.com/2.0/?method=geo.getevents&long='+lng+'&lat='+lat+'&api_key=027a3f56d29b8a14d7e2270344daf740&format=json&raw=true&distance=10&limit=25', function(data) {
 
 				  // Display multiple markers on a map
 				  var infoWindow = new google.maps.InfoWindow(), marker, i;
@@ -101,7 +101,7 @@ function getLastFmData(lat,lng) {
 // request top albums for headliner passed in as parameter from lastFM api and appends resulting data to infoWindowContent
 function getTopAlbums(iterator,headliner) {
 	
-		$.get('http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=' + headliner + '&api_key=027a3f56d29b8a14d7e2270344daf740&format=json&raw=true&limit=3', function(albumData) {
+		$.get('https://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=' + headliner + '&api_key=027a3f56d29b8a14d7e2270344daf740&format=json&raw=true&limit=3', function(albumData) {
 
 			var headlinerAlbums = [];
 
