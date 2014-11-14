@@ -1,0 +1,188 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or vendor/assets/stylesheets of plugins, if any, can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the top of the
+ * compiled file, but it's generally better to create a new file per style scope.
+ *
+
+
+ */
+
+/* Universal Styles */
+/* line 7, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+body {
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
+
+/* line 8, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+p {
+  font-size: 16px;
+}
+
+/* line 9, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+li {
+  font-size: 12px;
+}
+
+/* line 10, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+ul {
+  margin: 5px 0;
+  padding: 0 15px;
+}
+
+/* line 11, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+.clear {
+  clear: both;
+}
+
+/* nav bar */
+/* line 14, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin-bottom: 50px;
+  width: 100%;
+  color: #fff;
+  background: #000;
+  z-index: 1;
+}
+
+/* line 15, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+nav ul {
+  list-style: none;
+}
+
+/* line 16, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+nav ul li {
+  display: inline-block;
+  letter-spacing: 1px;
+  font-size: 25px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* line 17, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+nav img {
+  width: 100px;
+  vertical-align: middle;
+}
+
+/* Containers & Modals */
+/* line 20, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+#container {
+  width: 80%;
+  padding: 50px;
+  margin: 0 auto;
+  min-height: 600px;
+}
+
+/* line 21, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+.loading {
+  display: none;
+  width: 100%;
+  background: rgba(12, 12, 12, 0.2);
+  height: 100%;
+  position: fixed;
+  top: 0;
+}
+
+/* line 22, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+.loading img {
+  display: inline-block;
+  width: 20px;
+  margin: 100px auto;
+  position: fixed;
+  left: 49%;
+  top: 20%;
+}
+
+/* page html content */
+/* line 25, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+.center-span3 {
+  width: 25%;
+  min-width: 250px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* line 26, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+.button {
+  padding: 10px 20px;
+  background: #fff;
+  color: #FFAD00;
+  text-decoration: none;
+  border: #FFAD00 2px solid;
+}
+
+/* line 27, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+.button:hover {
+  background: #FFAD00;
+  color: #fff;
+}
+
+/* line 28, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+#container .instructions {
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* line 29, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+#city_result {
+  text-align: center;
+  margin: 30px 0;
+}
+
+/* line 30, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+#delete_location_button {
+  display: none;
+}
+
+/* google map formatting */
+/* line 33, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+#map-container {
+  width: 75%;
+  min-width: 300px;
+  margin: 20px auto;
+}
+
+/* line 34, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+#map-canvas {
+  width: 100%;
+  height: 300px;
+}
+
+/* line 35, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+.info_content h1 {
+  color: #FFAD00;
+  margin: 5px 0px;
+  border-bottom: #E9E9E9 1px solid;
+}
+
+/* line 36, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+.info_content h2 {
+  font-size: 15px;
+  margin: 0;
+}
+
+/* line 37, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+.info_content h3 {
+  font-size: 12px;
+  margin: 5px 0;
+}
+
+@media (max-width: 500px) {
+  /* line 42, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+  nav ul li {
+    font-size: 16px;
+  }
+
+  /* line 43, /Users/paulanderson/rails_projects/taproot_application/app/assets/stylesheets/welcome.css.scss */
+  nav img {
+    width: 60px;
+  }
+}
