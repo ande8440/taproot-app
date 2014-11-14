@@ -1,28 +1,22 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Simple app that uses Google maps and LastFM API to show user nearby music events based on location and related music albums upon clicking to learn more. Default location is New York, NY and the app does not request location or make API requests until the user explicitly elects to make his/her location available. User may also delete session location at his/her choice.
 
-Things you may want to cover:
+Things to note:
 
-* Ruby version
+* User must have location services enabled in their browser
 
-* System dependencies
+* API requests are made and processed via ajax and javascript so ruby controller code is minimal
 
-* Configuration
+* JS and HTML found in app/views/welcome/index.html.erb (put JS in script tag to allow use of embedded ruby/session variables to toggle whether or not to make LastFM API request)
 
-* Database creation
+* CSS located in assets/stylesheets/welcome.css.scss
 
-* Database initialization
+* Functional tests in test/controllers/welcome_controller_test.rb
 
-* How to run the test suite
+* Run <tt>rake test</tt> to run functional tests (test/unit library)
 
-* Services (job queues, cache servers, search engines, etc.)
+* Google Maps API only works with allowed referer https://sheltered-shelf-2222.herokuapp.com
 
-* Deployment instructions
+* PostgreSQL DB
 
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
